@@ -1,0 +1,4 @@
+interface:
+  display_name: "Model Orchestrator"
+  short_description: "Route Decide / Review / Ship across model classes"
+  default_prompt: "Use $model-orchestrator to auto-route this: decide (and judge-decision if contested), review with Fable/Claude if needed, then ship with Codex write access."
