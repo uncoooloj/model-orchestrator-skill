@@ -8,6 +8,7 @@ Resolve **family + level** to the best slug available on the current host. Slugs
 | --- | --- | --- | --- |
 | **Grok** | Cursor Grok, xAI | Judgment, framing, cutting scope, pushback | Decide |
 | **Fable / Claude** | Fable, Anthropic, Claude | Careful analysis, taste, missed risks, instruction fidelity | Review |
+| **Gemini** | Google Gemini | Long-context synthesis, sprawling mixed evidence | Synthesize |
 | **Codex** | OpenAI Codex coding agent | Tool-loop execution, repo edits, grind-to-done | Ship |
 | **Sol** | GPT generalist | Broad competent execution | Ship fallback |
 
@@ -22,7 +23,7 @@ Update this list when host model names change. Always pick the first available m
 | medium | `grok-4.5-fast-xhigh` (or current Grok caller) |
 | high / xhigh | `grok-4.5-fast-xhigh` |
 
-CLI fallback: `call-grok`.
+CLI fallback: `call-grok` when available.
 
 ### Review — Fable / Claude class
 
@@ -32,7 +33,15 @@ CLI fallback: `call-grok`.
 | high | `claude-fable-5-thinking-high`, `claude-opus-4-8-thinking-high` |
 | xhigh | `claude-opus-4-7-thinking-xhigh`, `claude-opus-4-8-thinking-high` |
 
-CLI fallback: `call-claude`.
+CLI fallback: `call-claude` when available.
+
+### Synthesize — Gemini class
+
+| Level | Prefer |
+| --- | --- |
+| medium / high | host Gemini slug if present; else `call-gemini` |
+
+CLI fallback: `call-gemini` when available. Use for large/mixed evidence compression, not as default Review or Ship.
 
 ### Ship — Codex class (write by default)
 
@@ -42,7 +51,7 @@ CLI fallback: `call-claude`.
 | medium | `gpt-5.3-codex`, `gpt-5.1-codex-max-medium` |
 | high | `gpt-5.1-codex-max-medium`, `gpt-5.3-codex` |
 
-CLI fallback: `call-codex` with `workspace-write` (or host equivalent). Read-only only when user asks plan-only.
+CLI fallback: `call-codex` with `workspace-write` when available. Read-only only when user asks plan-only.
 
 ### Ship fallback — Sol
 
@@ -64,17 +73,20 @@ When unsure between two levels, pick the higher one for Decide/Review and the lo
 
 ## Host capability matrix
 
-| Host capability | Decide | Review | Ship |
-| --- | --- | --- | --- |
-| Cursor Task + `model` | Grok slug or caller | Fable/Claude slug | Codex slug, writable |
-| `call-grok` only | Grok CLI | caller | caller |
-| `call-claude` only | caller | Claude CLI | caller or `call-codex` |
-| `call-codex` only | caller | caller | Codex CLI write |
-| All three adapters | `call-grok` | `call-claude` | `call-codex` write |
-| No adapters | caller (label gaps) | caller (label gaps) | caller (label gaps) |
+| Host capability | Decide | Review | Synthesize | Ship |
+| --- | --- | --- | --- | --- |
+| Cursor Task + `model` | Grok slug or caller | Fable/Claude slug | Gemini slug if any | Codex slug, writable |
+| `call-grok` | Grok CLI | — | — | — |
+| `call-claude` | — | Claude CLI | — | — |
+| `call-gemini` | — | — | Gemini CLI | — |
+| `call-codex` | — | — | — | Codex CLI write |
+| All adapters present | `call-grok` | `call-claude` | `call-gemini` | `call-codex` write |
+| No adapters | caller (label gaps) | caller (label gaps) | caller (label gaps) | caller (label gaps) |
+
+Use whatever subset is installed. Do not invent missing families.
 
 ## Anti-collusion
 
-- Do not send your preferred verdict into a Review/Judge subagent as the answer to confirm.
+- Do not send your preferred verdict into a Review/Judge/Synthesize subagent as the answer to confirm.
 - Send evidence + question + constraints; ask for independent judgment.
-- For contested paths, `judge-decision` owns the debate protocol — this skill only decides when to invoke it.
+- For contested paths, `judge-decision` owns the debate protocol and consults every available cross-family external.
