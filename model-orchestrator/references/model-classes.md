@@ -22,7 +22,7 @@ Update this list when host model names change. Always pick the first available m
 | medium | `grok-4.5-fast-xhigh` (or current Grok caller) |
 | high / xhigh | `grok-4.5-fast-xhigh` |
 
-If already running as Grok, keep Decide on the caller unless isolation is required.
+CLI fallback: `call-grok`.
 
 ### Review — Fable / Claude class
 
@@ -67,8 +67,10 @@ When unsure between two levels, pick the higher one for Decide/Review and the lo
 | Host capability | Decide | Review | Ship |
 | --- | --- | --- | --- |
 | Cursor Task + `model` | Grok slug or caller | Fable/Claude slug | Codex slug, writable |
+| `call-grok` only | Grok CLI | caller | caller |
 | `call-claude` only | caller | Claude CLI | caller or `call-codex` |
 | `call-codex` only | caller | caller | Codex CLI write |
+| All three adapters | `call-grok` | `call-claude` | `call-codex` write |
 | No adapters | caller (label gaps) | caller (label gaps) | caller (label gaps) |
 
 ## Anti-collusion

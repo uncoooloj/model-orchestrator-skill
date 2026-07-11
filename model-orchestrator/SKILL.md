@@ -16,7 +16,7 @@ description: >-
 
 Stay in one session. Route each phase of work to the model class that is best at it, at the reasoning level the stakes require. Do not make the user hop apps.
 
-This skill is the orchestrator. `judge-decision` is the contested-decision engine. Optional adapters `call-claude` and `call-codex` are transports when the host cannot spawn cross-model subagents directly.
+This skill is the orchestrator. `judge-decision` is the contested-decision engine. Optional adapters `call-claude`, `call-codex`, and `call-grok` are transports when the host cannot spawn cross-model subagents directly.
 
 For model-class defaults and reasoning ladders, read `references/model-classes.md`. For handoff packet shapes, read `references/phase-packets.md`.
 
@@ -69,7 +69,7 @@ Exact host slugs live in `references/model-classes.md`. Prefer **family + level*
    - Emit a one-screen **Routing Card** before spending tokens on the wrong class.
 
 2. **Decide (if needed).**
-   - Current agent (or a Grok-class subagent) frames constraints, success criteria, and the proposed path.
+   - Current agent (or a Grok-class subagent / `call-grok`) frames constraints, success criteria, and the proposed path.
    - If the path is contested, ambiguous with high cost of error, or the user asks to challenge/compare/decide → run **`judge-decision`** and treat its verdict as the locked decision packet.
    - Do not Ship on a Blocked or unsettled contested decision unless the user explicitly overrides.
 
@@ -99,7 +99,7 @@ Decide: <caller | Grok-class | skip>
 Judge: <judge-decision | skip> — reason
 Review: <Fable/Claude | skip> — reason
 Ship: <Codex write | Sol write | skip> — reason
-Adapters: <Task/subagent | call-claude | call-codex | none>
+Adapters: <Task/subagent | call-claude | call-codex | call-grok | none>
 ```
 
 ## Subagent Spawning
@@ -120,9 +120,10 @@ When the host can spawn subagents with a model override (e.g. Cursor `Task`):
 
 If model-overridden subagents are unavailable:
 
+- Decide → `call-grok` when installed and authenticated (and caller is not already Grok-family, or isolation is required).
 - Review → `call-claude` when installed and authenticated.
 - Ship → `call-codex` with write (`workspace-write` / equivalent) when installed and authenticated.
-- Judge external passes → follow `judge-decision` adapter rules; do not invent cross-model output.
+- Judge external passes → follow `judge-decision` adapter rules (`call-claude` / `call-codex` / additive `call-grok`); do not invent cross-model output.
 
 If no adapter works, complete the phase with the caller model and label the missing class as unavailable.
 
@@ -159,10 +160,10 @@ Remaining: <next action or "none">
 ## Failure Modes
 
 - Do not hop the user to another app when a subagent or adapter can do the phase in-session.
-- Do not pretend Fable/Claude/Codex ran if they did not.
+- Do not pretend Fable/Claude/Codex/Grok ran if they did not.
 - Do not give Ship a vague vibe prompt — require a locked plan packet.
 - Do not default Ship to read-only.
 - Do not skip `judge-decision` on contested high-stakes paths to "save time."
 - Do not let Review rewrite scope silently; surface material plan changes before Ship.
 - Do not treat Sol as interchangeable with Codex when Codex is available.
-- Do not hard-depend on companion skills; degrade gracefully and name the gap.
+- Do not hard-depend on companion skills; degrade gracefully and name the gap. Prefer `call-grok` / `call-claude` / `call-codex` when present.
