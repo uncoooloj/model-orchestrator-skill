@@ -7,7 +7,7 @@ Stay in one chat. Route each phase to the model class that is best at it.
 - **Review** — Fable / Claude: careful risks, taste, second-order misses
 - **Ship** — Codex with **write access by default**: implement the locked plan
 
-The skill auto-routes from the ask, spins sub-agents at the right reasoning level, and only falls back to CLI adapters (`call-claude`, `call-codex`) when the host cannot spawn cross-model subagents.
+The skill auto-routes from the ask, spins sub-agents at the right reasoning level, and only falls back to CLI adapters (`call-grok`, `call-claude`, `call-codex`) when the host cannot spawn cross-model subagents.
 
 ## Why It Exists
 
@@ -24,7 +24,8 @@ Switching apps to get Grok judgment, Claude review, and Codex execution breaks f
 
 Companion skills are optional adapters, not hard dependencies:
 
-- `judge-decision` — contested decision engine (invoked by this skill when needed)
+- `judge-decision` — contested decision engine (invoked by this skill when needed; may consult additive Grok via `call-grok`)
+- `call-grok` — Decide / judgment transport when in-host Grok subagents are unavailable
 - `call-claude` — Review transport when in-host Claude/Fable subagents are unavailable
 - `call-codex` — Ship transport when in-host Codex subagents are unavailable
 
