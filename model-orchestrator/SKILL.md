@@ -20,6 +20,7 @@ Stay in one session. Route each phase of work to the model class that is best at
 This skill is the orchestrator. `judge-decision` is the contested-decision engine. Optional adapters `call-claude`, `call-codex`, `call-grok`, and `call-gemini` are transports when the host cannot spawn cross-model subagents directly. Use whichever adapters are available; never simulate a missing family.
 
 For model-class defaults and reasoning ladders, read `references/model-classes.md`. For handoff packet shapes, read `references/phase-packets.md`.
+When comparing model or runtime candidates for an existing workflow, read [references/workload-benchmarks.md](references/workload-benchmarks.md) before ranking results.
 
 ## Core Rule
 
